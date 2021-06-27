@@ -5,14 +5,14 @@
 
 int main(void)
 {
-    char *home = NULL;
     gchar *tampon = NULL;
+    const char *home = getenv("HOME");
 
-    home = getenv("HOME");
     tampon = g_strdup_printf("%s/.config/NOD32_Extention/NOD32CMD.sh", home);
-
+    
     execl("/bin/sh", "sh", tampon, (char *) NULL);
-
+    
     g_free(tampon);
+    
     return 0;
 }

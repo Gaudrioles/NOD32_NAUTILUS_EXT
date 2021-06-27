@@ -21,18 +21,18 @@ $(TARGET_1): $(OBJECTS_1)
 $(TARGET_2): 
 		gcc tool.c $(GLIB) -o $(TARGET_2)
 
+plugin.o: plugin.c
+		gcc -c $(CFLAGS_1) plugin.c -o plugin.o
+
 install: all
 	mkdir -p $(LIBDIR)/nautilus/extensions-3.0/
 	mkdir -p $(HOME)/.config/NOD32_Extention/
-	sudo mv $(TARGET_1) $(LIBDIR)/nautilus/extensions-3.0/
-	mv $(TARGET_2) $(HOME)/.config/NOD32_Extention/
+	sudo cp $(TARGET_1) $(LIBDIR)/nautilus/extensions-3.0/
+	cp $(TARGET_2) $(HOME)/.config/NOD32_Extention/
 
 uninstall: all
-	sudo rm -rf $(HOME)/.config/NOD32_Extention/
-	rm -f $(LIBDIR)/nautilus/extensions-3.0/$(TARGET_1)
-
-plugin.o: plugin.c
-	gcc -c $(CFLAGS_1) plugin.c -o plugin.o
+	rm -rf $(HOME)/.config/NOD32_Extention/
+	sudo rm -f $(LIBDIR)/nautilus/extensions-3.0/$(TARGET_1)
 
 clean:
-	rm -f $(OBJECTS_1) $(TARGET_1) $(TARGET_2)
+	rm -f $(OBJECTS_1) $(TARGET_1) $(TARGET_2) tool.o

@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <locale.h>
 
 #include <nautilus-extension.h>
 #include <gtk/gtk.h>
@@ -9,11 +10,13 @@ static GType provider_types[1];
 static GType foo_extension_type;
 static GObjectClass *parent_class;
 
-typedef struct {
+typedef struct 
+{
 	GObject parent_slot;
 } FooExtension;
 
-typedef struct {
+typedef struct 
+{
 	GObjectClass parent_slot;
 } FooExtensionClass;
 
@@ -40,6 +43,7 @@ static GList * foo_extension_get_toolbar_items (NautilusMenuProvider *provider,
 /* command callback */
 void fonction_extension(NautilusMenuItem *item, gpointer user_data);
 void execution(char *CheminFichier);
+gboolean CreationFichierSh(char *chemin);
 
 void nautilus_module_initialize (GTypeModule  *module)
 {
@@ -120,13 +124,13 @@ static GList *foo_extension_get_file_items (NautilusMenuProvider *provider, GtkW
         for (l = files; l != NULL; l = l->next) 
         {
                 NautilusFileInfo *file = NAUTILUS_FILE_INFO (l->data);
-                char *name;
+                gchar *name;
                 name = nautilus_file_info_get_name (file);
                 g_print ("selected %s\n", name);
                 g_free (name);
         }
         
-        item = nautilus_menu_item_new ("Eset NOD32", "Analyser avec ESET NOD32 Antivirus", "ESET NOD32", "Antivirus");
+        item = nautilus_menu_item_new("Eset NOD32", "Analyser avec ESET NOD32 Antivirus", "ESET NOD32", "/opt/eset/esets/share/menu/app_icon_128.png");
 
         g_signal_connect(item, "activate", G_CALLBACK(fonction_extension), provider);
 
@@ -137,33 +141,42 @@ static GList *foo_extension_get_file_items (NautilusMenuProvider *provider, GtkW
         return ret;
 }
 
+void fonction_extension(NautilusMenuItem *item, gpointer user_data)
+{
+        GList *fichier;
+        GList *liste;
+        gchar *nom = NULL;
+        gchar *parent = NULL;
+
+        fichier = g_object_get_data ((GObject *) item, "foo_extension_files");
+
+        for (liste = fichier; liste != NULL; liste = liste->next) 
+        {
+                
+                NautilusFileInfo *file = NAUTILUS_FILE_INFO (liste->data);
+                nom = nautilus_file_info_get_name(file);
+
+                parent = g_file_get_path(nautilus_file_info_get_location(file));
+
+                execution(parent);
+
+                g_free(nom);
+                g_free(parent);
+        }
+
+        return;
+}
+
 void execution(char *CheminFichier)
 {
-        FILE *fichier = NULL;
-        char *home = NULL;
         gchar *tampon = NULL;
-        char buffer[1000];
-        
-        realpath(CheminFichier, buffer);
          
-        home = getenv("HOME");
+        const char *home = getenv("HOME");
 
-        realpath(CheminFichier, buffer);
-
-        tampon = g_strdup_printf("%s/.config/NOD32_Extention/NOD32CMD.sh", home);
-
-        fichier = fopen(tampon, "w");
-        
-        if(fichier == NULL)
+        if(CreationFichierSh(CheminFichier) != TRUE)
         {
                 return;
         }
-
-        fprintf(fichier, "#!/bin/sh\n\nsh /opt/eset/esets/lib/esets_scan.sh %s", buffer);
-
-        fclose(fichier);
-
-        g_free(tampon);
 
         tampon = g_strdup_printf("%s/.config/NOD32_Extention/NOD32_EXT", home);
 
@@ -174,24 +187,27 @@ void execution(char *CheminFichier)
         return;
 }
 
-void fonction_extension(NautilusMenuItem *item, gpointer user_data)
+gboolean CreationFichierSh(char *chemin)
 {
-        GList *fichier;
-        GList *liste;
-        gchar *nom = NULL;
+    FILE *fichier = NULL;
+    gchar *tampon = NULL;
 
-        fichier = g_object_get_data ((GObject *) item, "foo_extension_files");
+    const char *home = getenv("HOME");
 
-        for (liste = fichier; liste != NULL; liste = liste->next) 
-        {
-                
-                NautilusFileInfo *file = NAUTILUS_FILE_INFO (liste->data);
-                nom = nautilus_file_info_get_name(file);
+    tampon = g_strdup_printf("%s/.config/NOD32_Extention/NOD32CMD.sh", home);
+    
+    fichier = fopen(tampon, "w");
+        
+    if(fichier == NULL)
+    {
+        return FALSE;
+    }
+    
+    fprintf(fichier, "#!/bin/sh\n\nsh /opt/eset/esets/lib/esets_scan.sh %s", chemin);
 
-                execution(nom);
+    fclose(fichier);
 
-                g_free(nom);
-        }
+    g_free(tampon);
 
-        return;
+    return TRUE;
 }
