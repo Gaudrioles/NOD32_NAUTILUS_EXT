@@ -1,5 +1,3 @@
-#define GETTEXT_PACKAGE "gtk3"
-
 #include <nautilus-extension.h>
 #include "nautilus-nod32.h"
 
