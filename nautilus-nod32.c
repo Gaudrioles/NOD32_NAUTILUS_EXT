@@ -61,7 +61,7 @@ static GList *nautilus_nod32_get_file_items (NautilusMenuProvider *provider, Gtk
 		g_free (name);
 	}
     
-    item = nautilus_menu_item_new ("Eset NOD32", "Analyser avec ESET NOD32 Antivirus", "ESET NOD32", "drive-harddisk");
+    item = nautilus_menu_item_new ("Eset NOD32", "Analyser avec ESET NOD32 Antivirus", "ESET NOD32", "nod32");
 
 	g_signal_connect (item, "activate", G_CALLBACK (scan_to_callback), provider);
 

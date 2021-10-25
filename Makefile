@@ -30,9 +30,13 @@ $(BIN): $(OBJ)
 install: all
 	mkdir -p $(LIBDIR)/nautilus/extensions-3.0/
 	sudo cp $(BIN) $(LIBDIR)/nautilus/extensions-3.0/
+	sudo cp nod32.png /usr/share/icons/Adwaita/64x64/devices/nod32.png
+	sudo update-icon-caches /usr/share/icons/Adwaita/
 
 uninstall: all
 	sudo rm -f $(LIBDIR)/nautilus/extensions-3.0/$(BIN)
+	sudo rm /usr/share/icons/Adwaita/64x64/devices/nod32.png
+	sudo update-icon-caches /usr/share/icons/Adwaita/
 
 # Nettoyage #
 clean:
