@@ -1,38 +1,39 @@
-TARGET_1=nod32_nautilus_ext.so
-OBJECTS_1=plugin.o
+.PHONY: all clean install uninstall
 
-TARGET_2=NOD32_EXT
+# Variables #
+CC = gcc
+BIN = nautilus_nod32.so
+SRC= $(wildcard *.c)
+OBJ= $(SRC:.c=.o)
 
 LIBDIR=/usr/lib/x86_64-linux-gnu
 
-CFLAGS_1= -fPIC -g \
-	$(shell pkg-config --cflags gtk+-3.0 libnautilus-extension)
+# Flags pour le Compilateur et l'editeur de liens #
 
-LDFLAGS_1=-shared \
-	$(shell pkg-config --libs gtk+-3.0 libnautilus-extension)
+CFLAGS = -fPIC -g \
+	$(shell pkg-config --cflags libnautilus-extension)
 
-GLIB= `pkg-config --cflags --libs glib-2.0`
+LFLAGS = -shared \
+	$(shell pkg-config --libs libnautilus-extension)
 
-all: $(TARGET_1) $(TARGET_2)
+all: $(BIN)
 
-$(TARGET_1): $(OBJECTS_1)
-		gcc $(LDFLAGS_1) $(OBJECTS_1) -o $(TARGET_1)
+%.o: %.c *.h
+	$(CC) -c $< $(CFLAGS) -o $@
 
-$(TARGET_2): 
-		gcc tool.c $(GLIB) -o $(TARGET_2)
+%.o: %.c
+	$(CC) -c $< $(CFLAGS) -o $@
 
-plugin.o: plugin.c
-		gcc -c $(CFLAGS_1) plugin.c -o plugin.o
+$(BIN): $(OBJ)
+	$(CC) -s $^ $(LFLAGS) -o $@
 
 install: all
 	mkdir -p $(LIBDIR)/nautilus/extensions-3.0/
-	mkdir -p $(HOME)/.config/NOD32_Extention/
-	sudo cp $(TARGET_1) $(LIBDIR)/nautilus/extensions-3.0/
-	cp $(TARGET_2) $(HOME)/.config/NOD32_Extention/
+	sudo cp $(BIN) $(LIBDIR)/nautilus/extensions-3.0/
 
 uninstall: all
-	rm -rf $(HOME)/.config/NOD32_Extention/
-	sudo rm -f $(LIBDIR)/nautilus/extensions-3.0/$(TARGET_1)
+	sudo rm -f $(LIBDIR)/nautilus/extensions-3.0/$(BIN)
 
+# Nettoyage #
 clean:
-	rm -f $(OBJECTS_1) $(TARGET_1) $(TARGET_2) tool.o
+	rm -f $(OBJ) $(BIN)

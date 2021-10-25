@@ -1,1 +1,1 @@
-# NOD32_NAUTILUS_EXT
+# Unofficial eset nod32 nautilus extension

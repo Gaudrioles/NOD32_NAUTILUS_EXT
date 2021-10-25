@@ -6,6 +6,7 @@ obj/
 
 # VSCode Files
 .vs/
+.vscode/
 x64/
 x86/
 
