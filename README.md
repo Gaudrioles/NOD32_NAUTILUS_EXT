@@ -2,4 +2,4 @@
 
 build dependencies :
 
-        Ubuntu : sudo apt-get install libnautilus-extension-dev
+        Ubuntu : sudo apt-get install libnautilus-extension-dev libglib2.0-dev
