@@ -10,6 +10,6 @@ obj/
 x64/
 x86/
 
-# GCC Files
-.o
-.so
+# MakeFile
+*.o
+*.exe
